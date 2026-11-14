@@ -1,34 +1,31 @@
-name: import-reviewed-source
-on:
-  push:
-    branches: [main]
-    paths: [portfolio-source.zip]
-permissions:
-  contents: write
+name: ros-jazzy
+on: [push, pull_request]
 jobs:
-  import:
+  build-and-demo:
     runs-on: ubuntu-24.04
+    container: ros:jazzy-ros-base
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
-      - name: Verify and import reviewed source archive
-        shell: bash
+      - name: Install offline-demo dependencies
         run: |
-          python3 - <<'PYCODE'
-          import hashlib, pathlib, zipfile
-          archive = pathlib.Path("portfolio-source.zip")
-          assert hashlib.sha256(archive.read_bytes()).hexdigest() == "42cb95d0802d7cb10616a22e5372cdcfdfda2cb82c40a82bdf3c6de1027b16df", "Archive checksum mismatch"
-          with zipfile.ZipFile(archive) as source:
-              for entry in source.infolist():
-                  path = pathlib.PurePosixPath(entry.filename)
-                  assert not path.is_absolute() and ".." not in path.parts
-                  assert path.parts[0] not in {".git", ".github"}
-                  destination = pathlib.Path(*path.parts)
-                  destination.parent.mkdir(parents=True, exist_ok=True)
-                  destination.write_bytes(source.read(entry))
-          archive.unlink()
-          PYCODE
-          git config user.name shhr
-          git config user.email 141168900+addrun@users.noreply.github.com
-          git add --all
-          git commit -m "Publish reviewed ros2-rgbd-perception source"
-          git push origin HEAD:main
+          apt-get update
+          apt-get install -y python3-colcon-common-extensions python3-pytest python3-opencv python3-numpy ros-jazzy-cv-bridge ros-jazzy-message-filters
+      - name: Build and test
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          colcon build --symlink-install
+          source install/setup.bash
+          python3 -m pytest -q
+          colcon test --event-handlers console_cohesion+
+          colcon test-result --verbose
+      - name: Verify ROS messages with both depth encodings
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          source install/setup.bash
+          export ROS_DOMAIN_ID=87
+          export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+          python3 scripts/ros_smoke.py --encoding 16UC1
+          python3 scripts/ros_smoke.py --encoding 32FC1
