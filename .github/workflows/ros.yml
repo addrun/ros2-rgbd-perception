@@ -1,0 +1,34 @@
+name: import-reviewed-source
+on:
+  push:
+    branches: [main]
+    paths: [portfolio-source.zip]
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify and import reviewed source archive
+        shell: bash
+        run: |
+          python3 - <<'PYCODE'
+          import hashlib, pathlib, zipfile
+          archive = pathlib.Path("portfolio-source.zip")
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == "42cb95d0802d7cb10616a22e5372cdcfdfda2cb82c40a82bdf3c6de1027b16df", "Archive checksum mismatch"
+          with zipfile.ZipFile(archive) as source:
+              for entry in source.infolist():
+                  path = pathlib.PurePosixPath(entry.filename)
+                  assert not path.is_absolute() and ".." not in path.parts
+                  assert path.parts[0] not in {".git", ".github"}
+                  destination = pathlib.Path(*path.parts)
+                  destination.parent.mkdir(parents=True, exist_ok=True)
+                  destination.write_bytes(source.read(entry))
+          archive.unlink()
+          PYCODE
+          git config user.name shhr
+          git config user.email 141168900+addrun@users.noreply.github.com
+          git add --all
+          git commit -m "Publish reviewed ros2-rgbd-perception source"
+          git push origin HEAD:main
