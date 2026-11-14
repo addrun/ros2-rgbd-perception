@@ -1,0 +1,12 @@
+rgbd_detector:
+  ros__parameters:
+    backend: ultralytics
+    model_path: ""
+    yolov5_repo: ""
+    rgb_topic: /camera/color/image_rect
+    depth_topic: /camera/aligned_depth/image_raw
+    camera_info_topic: /camera/color/camera_info
+    confidence: 0.25
+    sync_slop: 0.03
+    min_depth_m: 0.1
+    max_depth_m: 10.0

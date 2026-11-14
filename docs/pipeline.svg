@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="300" viewBox="0 0 1100 300">
+<rect width="1100" height="300" rx="18" fill="#101c30"/>
+<g font-family="Arial, sans-serif" fill="#e5edf8">
+<text x="30" y="44" font-size="23" font-weight="bold">ROS 2 RGB-D target observations</text>
+<g fill="#1b304e" stroke="#3a607e" stroke-width="2">
+<rect x="28" y="82" width="236" height="116" rx="12"/>
+<rect x="298" y="82" width="236" height="116" rx="12"/>
+<rect x="568" y="82" width="236" height="116" rx="12"/>
+<rect x="838" y="82" width="234" height="116" rx="12"/>
+</g>
+<g font-size="18" text-anchor="middle">
+<text x="146" y="116">Aligned RGB + depth</text><text x="416" y="116">Detection boxes</text>
+<text x="686" y="116">Metric geometry</text><text x="955" y="116">TargetArray</text>
+</g>
+<g font-size="14" fill="#b4c7df" text-anchor="middle">
+<text x="146" y="151">Timestamp synchronizer</text><text x="146" y="177">CameraInfo + explicit units</text>
+<text x="416" y="151">YOLO / synthetic fixture</text><text x="416" y="177">Original-image coordinates</text>
+<text x="686" y="151">Median Z → X, Y, Z</text><text x="686" y="177">Optional unsigned PCA axis</text>
+<text x="955" y="151">Optical frame + timestamp</text><text x="955" y="177">ROS 2 DDS output</text>
+</g>
+<g stroke="#75d6c7" stroke-width="3"><path d="M270 140H291m-8-6 8 6-8 6M540 140H561m-8-6 8 6-8 6M810 140H831m-8-6 8 6-8 6" fill="none"/></g>
+<text x="30" y="245" font-size="17" fill="#75d6c7">Offline fixture: 16UC1 / 32FC1 → position [0, 0, 1.5] m</text>
+<text x="30" y="276" font-size="14" fill="#a9bad0">Fixture validates communication and geometry. Real camera alignment and detection accuracy need separate measurements.</text>
+</g></svg>
